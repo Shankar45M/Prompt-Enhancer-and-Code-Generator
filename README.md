@@ -60,13 +60,13 @@ The result is a developer tool — not a chatbot.
 
 | View | Screenshot |
 |---|---|
-| Home Page | ![Home Page](screenshots/home.png) |
-| Input Page | ![Input Page](screenshots/input.png) |
-| Generation Pipeline | ![Pipeline](screenshots/pipeline.png) |
-| Enhanced Prompt | ![Enhanced Prompt](screenshots/enhanced-prompt.png) |
-| Generated Code | ![Generated Code](screenshots/generated-code.png) |
-| Developer Stats | ![Stats](screenshots/stats.png) |
-| Live Preview | ![Live Preview](screenshots/live-preview.png) |
+| Home Page | ![Home Page](![alt text](image.png)) |
+| Input Page | ![Input Page](![alt text](image-1.png)) |
+| Generation Pipeline | ![Pipeline](![alt text](image-2.png)) |
+| Enhanced Prompt | ![Enhanced Prompt](![alt text](image-3.png)![alt text](image-4.png)![alt text](image-5.png)) |
+| Generated Code | ![Generated Code](![alt text](image-6.png)![alt text](image-7.png)) |
+| Developer Stats | ![Stats](![alt text](image-8.png)) |
+| Live Preview | ![Live Preview](![alt text](image-9.png)) |
 
 ---
 
