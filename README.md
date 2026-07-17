@@ -213,16 +213,7 @@ Generates server-side applications with:
 | Java | `java` | `Main.java` | DSA |
 | C | `c` | `main.c` | DSA |
 | C++ | `cpp` | `main.cpp` | DSA |
-| JavaScript | `javascript` | — | Enhancer only |
-| TypeScript | `typescript` | — | Enhancer only |
 | HTML + CSS + JS | `markup` | `index.html` | Frontend |
-| SQL | `sql` | — | Enhancer only |
-| R | `r` | — | Enhancer only |
-| x86 Assembly | `nasm` | — | Enhancer only |
-| Bash | `bash` | — | Enhancer only |
-| Ruby | `ruby` | — | Enhancer only |
-| Scala | `scala` | — | Enhancer only |
-| Dart | `dart` | — | Enhancer only |
 | Node.js | `javascript` | `server.js` | Backend |
 
 > *"Enhancer only" means the language profile exists in `enhancer.py` for prompt enhancement but is not yet exposed in the frontend UI selectors.*
