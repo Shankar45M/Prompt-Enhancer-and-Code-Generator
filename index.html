@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Enhancer + Code Generator</title>
+  <link rel="stylesheet" href="style.css" />
+  <link id="prismThemeDark" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <link id="prismThemeLight" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css" rel="stylesheet" disabled />
+</head>
+<body>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <div id="cursorGlow" class="cursor-glow" aria-hidden="true"></div>
+  <div id="cursorDot" class="cursor-dot" aria-hidden="true"></div>
+
+  <div id="historyMenu" class="history-menu">
+    <button
+      id="historyToggle"
+      class="history-toggle"
+      type="button"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="historyDropdown"
+    >
+      <span class="history-toggle-icon" aria-hidden="true">☰</span>
+      <span>History</span>
+    </button>
+    <div id="historyDropdown" class="history-dropdown" role="menu" aria-hidden="true">
+      <div class="history-dropdown-header">
+        <span class="history-chevron" aria-hidden="true">▼</span>
+        <span>Recent Generations</span>
+      </div>
+      <div id="historyList" class="history-dropdown-list" role="list"></div>
+      <div id="historyEmpty" class="history-empty">No generations yet.</div>
+      <div class="history-dropdown-divider" aria-hidden="true"></div>
+      <button id="clearHistoryBtn" type="button" class="history-clear-btn">🗑 Clear History</button>
+    </div>
+  </div>
+
+  <main class="page-scroll">
+    <section id="hero-section" class="page-section hero-section">
+      <div class="section-shell hero-shell">
+        <h1 id="appTitle" class="app-title">Prompt Enhancer + Code Generator</h1>
+        <p
+          id="appSubtitle"
+          class="app-subtitle"
+          data-text="Enter a prompt, click Generate, and view enhanced prompt and generated code."
+        >Enter a prompt, click Generate, and view enhanced prompt and generated code.</p>
+        <button id="startBtn" type="button" class="start-btn" aria-controls="input-section">Start</button>
+      </div>
+    </section>
+
+    <section id="input-section" class="page-section input-section">
+      <div class="section-shell input-shell">
+        <label for="promptInput">User Prompt</label>
+        <textarea id="promptInput" placeholder="Popular Examples
+          🎨 Student Portal
+          🎨 Admin Dashboard
+          ⚙ Authentication API
+          🧠 Dijkstra Algorithm"></textarea>
+
+        <div class="form-row project-type-row">
+          <div class="form-group project-type-group">
+            <label class="project-type-label">Project Type</label>
+            <div class="project-type-grid" role="radiogroup" aria-label="Project type">
+              <label class="project-card">
+                <input type="radio" name="projectType" value="dsa" />
+                <span class="project-card-body">
+                  <span class="project-card-title">DSA &amp; Algorithms</span>
+                  <span class="project-card-desc">Interview-style problems, data structures, and algorithms.</span>
+                </span>
+              </label>
+              <label class="project-card">
+                <input type="radio" name="projectType" value="frontend" />
+                <span class="project-card-body">
+                  <span class="project-card-title">Frontend Development</span>
+                  <span class="project-card-desc">Responsive UIs, dashboards, portals, and animations.</span>
+                </span>
+              </label>
+              <label class="project-card">
+                <input type="radio" name="projectType" value="backend" />
+                <span class="project-card-body">
+                  <span class="project-card-title">Backend Development</span>
+                  <span class="project-card-desc">APIs, CRUD systems, authentication, and services.</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div id="dsaLanguageGroup" class="form-row language-group is-hidden" aria-hidden="true">
+          <div class="form-group">
+            <label for="dsaLanguageSelect">Choose Language</label>
+            <select id="dsaLanguageSelect" class="language-select"></select>
+          </div>
+        </div>
+
+        <div id="backendLanguageGroup" class="form-row language-group is-hidden" aria-hidden="true">
+          <div class="form-group">
+            <label for="backendLanguageSelect">Choose Backend Language</label>
+            <select id="backendLanguageSelect" class="language-select"></select>
+          </div>
+        </div>
+
+        <div id="frontendNote" class="form-row language-group is-hidden" aria-hidden="true">
+          <div class="frontend-note">Using HTML + CSS + JavaScript (inline) automatically.</div>
+        </div>
+
+        <div class="generation-controls">
+          <div class="control-actions">
+            <div class="actions">
+              <button id="generateBtn" type="button">Generate</button>
+            </div>
+            <div class="nav-actions nav-actions-input">
+              <button id="homeBtnInput" type="button" class="nav-btn">Home</button>
+            </div>
+          </div>
+          <div id="pipelineStatus" class="pipeline-status" aria-live="polite">
+            <div class="pipeline-track">
+              <div class="pipeline-stage" data-stage="analyzing">
+                <span class="pipeline-dot"></span>
+                <span class="pipeline-label">ANALYZING INPUT</span>
+              </div>
+              <span class="pipeline-connector"></span>
+              <div class="pipeline-stage" data-stage="enhancing">
+                <span class="pipeline-dot"></span>
+                <span class="pipeline-label">ENHANCING PROMPT</span>
+              </div>
+              <span class="pipeline-connector"></span>
+              <div class="pipeline-stage" data-stage="generating">
+                <span class="pipeline-dot"></span>
+                <span class="pipeline-label">GENERATING CODE</span>
+              </div>
+              <span class="pipeline-connector"></span>
+              <div class="pipeline-stage" data-stage="finalizing">
+                <span class="pipeline-dot"></span>
+                <span class="pipeline-label">FINALIZING OUTPUT</span>
+              </div>
+            </div>
+            <div class="pipeline-done-label"></div>
+          </div>
+        </div>
+
+        <div id="errorText" class="error"></div>
+      </div>
+    </section>
+
+    <section id="output-section" class="page-section output-section">
+      <div class="section-shell output-shell workspace">
+        <div class="workspace-top">
+          <div class="nav-actions nav-actions-output">
+            <div class="stats-wrapper">
+              <button id="timingInfoBtn" type="button" class="nav-btn timing-info-btn">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
+                  <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 9v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="10" cy="6.5" r="0.9" fill="currentColor"/>
+                </svg>
+                Stats
+              </button>
+              <div id="timingPopover" class="timing-popover">
+                <div class="timing-header">Performance Metrics</div>
+                <div class="timing-sep"></div>
+                <div class="timing-row"><span class="timing-key">Prompt Enhancement</span><span class="timing-val" id="timingEnhancement"></span></div>
+                <div class="timing-row"><span class="timing-key">Code Generation</span><span class="timing-val" id="timingGeneration"></span></div>
+                <div class="timing-sep"></div>
+                <div class="timing-row timing-total"><span class="timing-key">Total Time</span><span class="timing-val" id="timingTotal"></span></div>
+              </div>
+            </div>
+            <button id="homeBtnOutput" type="button" class="nav-btn">Home</button>
+            <button id="modifyInputBtn" type="button" class="nav-btn">Modify Input</button>
+          </div>
+          <div class="workspace-tabs" role="tablist" aria-label="AI workspace tabs">
+            <button
+              id="promptTabBtn"
+              class="tab-btn is-active"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="prompt-panel"
+              data-tab="prompt-panel"
+            >
+              Enhanced Prompt
+            </button>
+            <button
+              id="codeTabBtn"
+              class="tab-btn"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="code-panel"
+              data-tab="code-panel"
+            >
+              Generated Code
+            </button>
+            <span id="tabIndicator" class="tab-indicator" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <div class="tab-panels">
+          <div id="prompt-panel" class="tab-panel is-active" role="tabpanel" aria-labelledby="promptTabBtn">
+            <div class="prompt-panel">
+              <div class="prompt-scroll">
+                <header class="prompt-hero">
+                  <div class="prompt-title">Enhanced Prompt</div>
+                  <p id="promptSummary" class="prompt-summary-text">No data yet.</p>
+                  <div id="promptMeta" class="prompt-meta"></div>
+                </header>
+
+                <div class="prompt-grid">
+                  <article id="promptFeaturesCard" class="prompt-card">
+                    <h3>AI Inferred Features</h3>
+                    <ul id="promptFeatures" class="prompt-list"></ul>
+                  </article>
+                  <article id="promptArchitectureCard" class="prompt-card">
+                    <h3>Architecture Understanding</h3>
+                    <ul id="promptArchitecture" class="prompt-list"></ul>
+                  </article>
+                  <article id="promptImplementationCard" class="prompt-card">
+                    <h3>Implementation Goals</h3>
+                    <ul id="promptImplementation" class="prompt-list"></ul>
+                  </article>
+                </div>
+
+                <article id="promptConstraintsCard" class="prompt-card prompt-card-wide">
+                  <h3>Constraints</h3>
+                  <ul id="promptConstraints" class="prompt-list"></ul>
+                </article>
+
+                <article class="prompt-card prompt-card-wide prompt-raw-card">
+                  <h3>Enhanced Prompt</h3>
+                  <div id="promptRaw" class="prompt-raw">No data yet.</div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div id="code-panel" class="tab-panel" role="tabpanel" aria-labelledby="codeTabBtn">
+            <div id="editorShell" class="editor-shell theme-dark">
+              <div class="editor-header">
+                <div class="editor-left">
+                  <div class="editor-dots" aria-hidden="true">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                  </div>
+                  <span id="fileLabel" class="file-label">index.html</span>
+                </div>
+                <div class="editor-right">
+                  <span id="languageBadge" class="language-badge">Language</span>
+                  <button id="livePreviewBtn" class="editor-btn is-hidden" type="button">Live Preview</button>
+                  <button id="fullscreenBtn" class="editor-btn" type="button">Fullscreen</button>
+                  <button id="toggleThemeBtn" class="editor-btn" type="button" aria-label="Toggle code theme" aria-pressed="false">Light</button>
+                  <button id="copyCodeBtn" class="editor-btn" type="button">Copy Code</button>
+                </div>
+              </div>
+              <div class="editor-body">
+                <div id="editorGutter" class="editor-gutter" aria-hidden="true">
+                  <div class="line-numbers"></div>
+                </div>
+                <div class="editor-divider"></div>
+                <pre id="editorPre" class="editor-pre" tabindex="0">
+                  <code id="generatedCode" class="language-python">No data yet.</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="languageMarquee" class="language-marquee" aria-hidden="true"></div>
+
+  <div id="editorModal" class="modal editor-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="editor" aria-hidden="true"></div>
+    <div id="editorModalContent" class="modal-content editor-modal-content" role="dialog" aria-modal="true" aria-label="Fullscreen code editor">
+      <div class="editor-header editor-header-modal">
+        <div class="editor-left">
+          <div class="editor-dots" aria-hidden="true">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <span id="fullscreenFileLabel" class="file-label">index.html</span>
+        </div>
+        <div class="editor-right">
+          <span id="fullscreenLanguageBadge" class="language-badge">Language</span>
+          <button id="fullscreenCloseBtn" class="editor-btn" type="button">Exit Fullscreen</button>
+        </div>
+      </div>
+      <div class="editor-body">
+        <div id="fullscreenGutter" class="editor-gutter" aria-hidden="true">
+          <div class="line-numbers"></div>
+        </div>
+        <div class="editor-divider"></div>
+        <pre id="fullscreenPre" class="editor-pre" tabindex="0">
+          <code id="fullscreenCode" class="language-python"></code>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div id="previewModal" class="modal preview-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="preview" aria-hidden="true"></div>
+    <div id="previewModalContent" class="modal-content preview-modal-content" role="dialog" aria-modal="true" aria-label="Live preview">
+      <div class="preview-header">
+        <span class="preview-title">Live Preview</span>
+        <button id="previewCloseBtn" class="editor-btn" type="button">Close</button>
+      </div>
+      <iframe
+        id="previewFrame"
+        class="preview-frame"
+        title="Live preview"
+        sandbox="allow-scripts"
+        referrerpolicy="no-referrer"
+      ></iframe>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-c.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-cpp.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-java.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-markup.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-sql.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-r.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-nasm.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-ruby.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-scala.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-dart.min.js"></script>
+
+</body>
+</html>
